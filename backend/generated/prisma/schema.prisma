@@ -1,0 +1,212 @@
+generator client {
+  provider = "prisma-client-js"
+  output   = "../generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model User {
+  id                   String    @id @default(uuid())
+  email                String    @unique
+  password             String
+  name                 String
+  phoneNumber          String?
+  role                 String    @default("ADMIN")
+  isActive             Boolean   @default(true)
+  resetPasswordToken   String?
+  resetPasswordExpires DateTime?
+  createdAt            DateTime  @default(now())
+  updatedAt            DateTime  @updatedAt
+
+  @@index([email])
+}
+
+model AppointmentType {
+  id          String     @id @default(uuid())
+  typeName    String     @unique
+  description String?
+  isActive    Boolean    @default(true)
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
+  bookings    Booking[]
+  waitlist    Waitlist[]
+
+  @@index([isActive])
+}
+
+model Location {
+  id           String     @id @default(uuid())
+  locationName String     @unique
+  address      String
+  city         String
+  state        String
+  zipCode      String
+  phoneNumber  String?
+  email        String?
+  isActive     Boolean    @default(true)
+  createdAt    DateTime   @default(now())
+  updatedAt    DateTime   @updatedAt
+  bookings     Booking[]
+  waitlist     Waitlist[]
+
+  @@index([isActive])
+  @@index([city, state])
+}
+
+model SlotConfiguration {
+  id                        String        @id @default(uuid())
+  availableDays             Int[]
+  startTime                 String
+  endTime                   String
+  slotDurationMinutes       Int           @default(30)
+  slotsPerInterval          Int           @default(1)
+  bufferTimeMinutes         Int           @default(0)
+  advanceBookingDays        Int           @default(90)
+  sameDayBookingCutoffHours Int           @default(2)
+  minAdvanceBookingHours    Int           @default(24)
+  isActive                  Boolean       @default(true)
+  createdAt                 DateTime      @default(now())
+  updatedAt                 DateTime      @updatedAt
+  specialDates              SpecialDate[]
+}
+
+model SpecialDate {
+  id                           String             @id @default(uuid())
+  slotConfigurationId          String?
+  date                         DateTime           @db.Date
+  dateType                     SpecialDateType
+  reason                       String?
+  isClosed                     Boolean            @default(false)
+  modifiedStartTime            String?
+  modifiedEndTime              String?
+  appliesToAllLocations        Boolean            @default(false)
+  appliesToAllAppointmentTypes Boolean            @default(false)
+  createdAt                    DateTime           @default(now())
+  updatedAt                    DateTime           @updatedAt
+  slotConfiguration            SlotConfiguration? @relation(fields: [slotConfigurationId], references: [id], onDelete: Cascade)
+
+  @@index([date])
+}
+
+model Booking {
+  id                 String              @id @default(uuid())
+  appointmentTypeId  String
+  locationId         String
+  bookingReference   String              @unique @default(cuid())
+  appointmentDate    DateTime            @db.Date
+  appointmentTime    String
+  firstName          String
+  lastName           String
+  email              String
+  phoneNumber        String
+  status             BookingStatus       @default(PENDING)
+  bookingDate        DateTime            @default(now())
+  cancellationDate   DateTime?
+  cancelledBy        CancelledBy?
+  cancellationReason String?
+  notes              String?
+  createdAt          DateTime            @default(now())
+  updatedAt          DateTime            @updatedAt
+  appointmentType    AppointmentType     @relation(fields: [appointmentTypeId], references: [id], onDelete: Cascade)
+  location           Location            @relation(fields: [locationId], references: [id], onDelete: Cascade)
+  emailNotifications EmailNotification[]
+
+  @@index([locationId, appointmentDate])
+  @@index([appointmentTypeId, appointmentDate])
+  @@index([status])
+  @@index([bookingReference])
+  @@index([locationId, appointmentTypeId, appointmentDate, appointmentTime, status])
+  @@index([email])
+}
+
+model Waitlist {
+  id                 String              @id @default(uuid())
+  appointmentTypeId  String
+  locationId         String
+  preferredDateStart DateTime?           @db.Date
+  preferredDateEnd   DateTime?           @db.Date
+  firstName          String
+  lastName           String
+  email              String
+  phoneNumber        String
+  status             WaitlistStatus      @default(WAITING)
+  position           Int?
+  joinedAt           DateTime            @default(now())
+  notifiedAt         DateTime?
+  notificationCount  Int                 @default(0)
+  expiresAt          DateTime?
+  notes              String?
+  createdAt          DateTime            @default(now())
+  updatedAt          DateTime            @updatedAt
+  emailNotifications EmailNotification[]
+  appointmentType    AppointmentType     @relation(fields: [appointmentTypeId], references: [id], onDelete: Cascade)
+  location           Location            @relation(fields: [locationId], references: [id], onDelete: Cascade)
+
+  @@index([status])
+  @@index([appointmentTypeId, locationId])
+  @@index([joinedAt])
+}
+
+model EmailNotification {
+  id             String      @id @default(uuid())
+  userId         String
+  emailType      EmailType
+  recipientEmail String
+  subject        String
+  status         EmailStatus @default(PENDING)
+  sentAt         DateTime?
+  bookingId      String?
+  waitlistId     String?
+  errorMessage   String?
+  createdAt      DateTime    @default(now())
+  booking        Booking?    @relation(fields: [bookingId], references: [id])
+  waitlist       Waitlist?   @relation(fields: [waitlistId], references: [id])
+
+  @@index([userId])
+  @@index([status])
+  @@index([emailType])
+  @@index([sentAt])
+}
+
+enum SpecialDateType {
+  HOLIDAY
+  CLOSURE
+  MODIFIED_HOURS
+}
+
+enum BookingStatus {
+  PENDING
+  CONFIRMED
+  CANCELLED
+  COMPLETED
+}
+
+enum CancelledBy {
+  USER
+  ADMIN
+}
+
+enum WaitlistStatus {
+  WAITING
+  NOTIFIED
+  BOOKED
+  EXPIRED
+  CANCELLED
+}
+
+enum EmailType {
+  BOOKING_CONFIRMATION
+  CANCELLATION_CONFIRMATION
+  WAITLIST_NOTIFICATION
+  REMINDER
+  SLOT_AVAILABLE
+}
+
+enum EmailStatus {
+  PENDING
+  SENT
+  FAILED
+  BOUNCED
+}
