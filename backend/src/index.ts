@@ -1,6 +1,6 @@
 import app from "./app";
 import dotenv from "dotenv";
-import "./workers/emailWorker";
+
 import cronService from "./services/cron.service";
 dotenv.config();
 
