@@ -837,9 +837,23 @@ docker-compose exec backend npx prisma migrate deploy
 4. **Setup SSL** (recommended)
    Use a reverse proxy like Nginx or Traefik with Let's Encrypt for SSL certificates
 
-## 🙏 Acknowledgments
+## � License
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
+**You are free to:**
+- ✅ Use this project for commercial purposes
+- ✅ Modify and distribute the code
+- ✅ Use it for private projects
+
+**You must:**
+- ✅ Include the original license
+- ✅ Provide attribution
+
+## �🙏 Acknowledgments
 
 - Built with React, Express, and Prisma
 - UI components from Radix UI and Tailwind CSS
 - Icons from Lucide React
 - Email queue powered by BullMQ
+
