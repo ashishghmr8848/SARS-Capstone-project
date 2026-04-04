@@ -1,0 +1,38 @@
+DevOps Learning Journey
+========================
+
+Date: April 3, 2026
+Status: Just launched CI/CD pipeline!
+
+🎯 Goals:
+- Master DevOps & CI/CD pipelines
+- Learn AWS & Cloud infrastructure
+- Build automated systems
+- Become a DevOps Engineer
+
+✅ Accomplishments:
+- GitHub Actions CI/CD pipeline (WORKING!)
+- Docker containerization
+- PostgreSQL + Redis setup
+- Automated testing & security scanning
+- Infrastructure as Code ready
+
+🔥 Next Steps:
+- Learn Kubernetes
+- AWS certification
+- Terraform
+- Advanced monitoring
+
+Skills Focus:
+- Git & Version Control ✅
+- CI/CD Pipelines ✅
+- Docker & Containers ✅
+- Linux/Bash (Next)
+- AWS (Next)
+- Kubernetes (Next)
+
+Target: DevOps/SRE Engineer
+Salary Target: $150K-$250K+
+Timeline: 6-12 months
+
+This file tracks my DevOps journey!
